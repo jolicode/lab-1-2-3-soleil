@@ -63,7 +63,7 @@ var motionBoxes = [];
 var motionCoords = [];
 
 var motionBoxDiv;
-var playingSwitch = true;
+var playingSwitch = false;
 
 var constraints = {
     audio: false,
@@ -84,31 +84,32 @@ function initSuccess(requestedStream) {
     start = true;
     win = false;
     stream = requestedStream;
+    if (!stream) {
+			throw 'Cannot start after init fail';
+		}
+
+		// streaming takes a moment to start
+		video.addEventListener('canplay', startComplete);
     video.srcObject = stream;
-    captureInterval = setInterval(capture, captureIntervalTime);
-    playing();
 }
+
+function startComplete() {
+		video.removeEventListener('canplay', startComplete);
+    captureInterval = setInterval(capture, captureIntervalTime);
+    waiting();
+	}
 
 function initError(error) {
     console.log(error);
 }
 
 function playing() {
-
-  for (var i = 0; i < eyes.length; i++) {
-    if (eyes[i].dataset.number == 2) {
-      eyes[i].classList.toggle('visible');
-    }
-    if (eyes[i].dataset.number == 1) {
-      eyes[i].classList.remove('visible');
-    }
-  }
+  toggleEyes(2);
   if (!win) {
     console.log('data reset');
 
     var playingTimer = setTimer(gameCounter, () => {
       playingSwitch = false;
-      motionCoords = [];
       if (motionCoords.length > 1000) {
         gameCounter.innerHTML = "1";
         gameCounter.dataset.time = 1000;
@@ -118,34 +119,45 @@ function playing() {
         gameCounter.dataset.time = 3000;
         waiting();
       }
+      motionCoords = [];
     })
   }
 }
 
 function resetting() {
+  console.log('resetting');
+  toggleEyes(3);
   var resettingTimer = setTimer(gameCounter, () => {
-    gameCounter.innerHTML = "3";
-    gameCounter.dataset.time = 3000;
-    waiting();
+    toggleEyes(5);
+    gameCounter.innerHTML = "1";
+    gameCounter.dataset.time = 1000;
+    var resettingTimer2 = setTimer(gameCounter, () => {
+      gameCounter.innerHTML = "3";
+      gameCounter.dataset.time = 3000;
+      waiting();
+    })
   })
 }
 
 function waiting() {
   if (!win) {
-    for (var i = 0; i < eyes.length; i++) {
-      if (eyes[i].dataset.number == 2) {
-        eyes[i].classList.remove('visible');
-      }
-      if (eyes[i].dataset.number == 1) {
-        eyes[i].classList.toggle('visible');
-      }
-    }
+    toggleEyes(1);
     var waitingTimer = setTimer(gameCounter, () => {
       gameCounter.innerHTML = "3";
       gameCounter.dataset.time = 3000;
       playingSwitch = true;
       playing();
     })
+  }
+}
+
+function toggleEyes(number) {
+  for (var i = 0; i < eyes.length; i++) {
+    if (eyes[i].dataset.number == number) {
+      eyes[i].classList.toggle('visible');
+    } else {
+      eyes[i].classList.remove('visible');
+    }
   }
 }
 
