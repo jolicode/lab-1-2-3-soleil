@@ -7,9 +7,46 @@
 </head>
 <body>
   <div id="body">
-    <video id="video" autoplay></video>
-    <div class="motion-box"></div>
-    <canvas id="motion"></canvas>
+    <div id="introduction">
+      <h1>1 2 3 soleil</h1>
+      <p>
+        Little game using Js motion detection. Your goal is to press space without being spotted by the computeur.
+        You will have 3 seconds to move than 3 where you cannot.
+
+        When play is pressed, you'll have 10 seconds to go to base camp (10 meters from the computeur).
+      </p>
+      <a href="#" class="play-button">Play</a>
+    </div>
+
+    <div id="start" data-time="1000" >10</div>
+
+    <div id="eyes">
+      <img class="eyesPicto" src="eye1.svg" data-number="1" alt="">
+      <img class="eyesPicto" src="eye1.svg" data-number="1" alt="">
+
+      <img class="eyesPicto" src="eye2.svg" data-number="2" alt="">
+      <img class="eyesPicto" src="eye2.svg" data-number="2" alt="">
+
+      <img class="eyesPicto" src="eye3.svg" data-number="3" alt="">
+      <img class="eyesPicto" src="eye3.svg" data-number="3" alt="">
+
+      <img class="eyesPicto" src="eye4.svg" data-number="4" alt="">
+      <img class="eyesPicto" src="eye4.svg" data-number="4" alt="">
+
+      <img class="eyesPicto" src="eye5.svg" data-number="5" alt="">
+      <img class="eyesPicto" src="eye5.svg" data-number="5" alt="">
+    </div>
+
+    <div id="game">
+      <div id="gameCount" data-time="3000" >3</div>
+      <video id="video" autoplay></video>
+      <div id="box-container"></div>
+      <!-- <div class="motion-box"></div> -->
+      <canvas id="motion"></canvas>
+      <div class="win">
+        <p>You win</p>
+      </div>
+    </div>
   </div>
 
 </body>
