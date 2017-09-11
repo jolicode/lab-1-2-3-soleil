@@ -77,6 +77,13 @@ playButton.addEventListener('click', (e) => {
   e.preventDefault();
   setTimer(document.getElementById('start'), () => {
     navigator.mediaDevices.getUserMedia(constraints).then(initSuccess).catch(initError);
+    document.getElementById('start').classList.toggle('visible');
+    playButton.classList.toggle('visible');
+    document.querySelector('.rules').classList.toggle('out');
+    document.querySelector('.alerts').classList.toggle('out');
+    // preparing reset
+    document.getElementById('start').innerHTML = "10";
+    document.getElementById('start').dataset.time = 10000;
   });
 })
 
@@ -110,13 +117,11 @@ function playing() {
 
     var playingTimer = setTimer(gameCounter, () => {
       playingSwitch = false;
+      gameCounter.innerHTML = "3";
+      gameCounter.dataset.time = 3000;
       if (motionCoords.length > 1000) {
-        gameCounter.innerHTML = "1";
-        gameCounter.dataset.time = 1000;
         resetting();
       } else {
-        gameCounter.innerHTML = "3";
-        gameCounter.dataset.time = 3000;
         waiting();
       }
       motionCoords = [];
@@ -125,17 +130,23 @@ function playing() {
 }
 
 function resetting() {
-  console.log('resetting');
-  toggleEyes(3);
+  var eyesNum = 3;
+  var changeEyes = setInterval(() => {
+    if (eyesNum <= 5) {
+      toggleEyes(eyesNum);
+      eyesNum ++;
+    } else if (eyesNum >= 1) {
+      toggleEyes(eyesNum);
+      eyesNum --;
+    }
+  }, 1000);
+  document.querySelector('.spotted').classList.toggle('visible');
   var resettingTimer = setTimer(gameCounter, () => {
-    toggleEyes(5);
-    gameCounter.innerHTML = "1";
-    gameCounter.dataset.time = 1000;
-    var resettingTimer2 = setTimer(gameCounter, () => {
-      gameCounter.innerHTML = "3";
-      gameCounter.dataset.time = 3000;
-      waiting();
-    })
+    gameCounter.innerHTML = "3";
+    gameCounter.dataset.time = 3000;
+    clearInterval(changeEyes);
+    document.querySelector('.spotted').classList.toggle('visible');
+    waiting();
   })
 }
 
@@ -246,7 +257,7 @@ function capture() {
 
     // drawing all save motion data
     for (var y = 0; y < motionCoords.length; y++) {
-      motionContext.fillStyle = "cyan";
+      motionContext.fillStyle = "#FFF200";
       motionContext.fillRect(motionCoords[y].x - 2, motionCoords[y].y - 2, 4, 4)
     }
 
@@ -310,6 +321,7 @@ function checkKey(e) {
         clearInterval(captureInterval);
         var winText = document.querySelector('.win');
         winText.classList.add('visible');
+        playButton.classList.toggle('visible');
       }
     }
 }
@@ -317,7 +329,7 @@ function checkKey(e) {
 function setTimer(el, callback) {
   var time = el.dataset.time;
   var timerInterval = setInterval(() => {
-    if (time > 1000) {
+    if (time >= 1000) {
       time -= 1000;
       el.innerHTML = time/1000
     } else {

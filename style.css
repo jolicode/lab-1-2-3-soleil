@@ -5,14 +5,115 @@
   display: none;
 }
 
-#motion {
-  /*display: none;*/
+.title {
+  font-family: 'Montserrat', sans-serif;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+* {
+  font-family: 'Cardo', serif;
+  color: #303481;
+  box-sizing: border-box;
+}
+
+#body, body {
+  background: #F5F5F5;
+  height: 100vh;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+}
+
+b {
+  background: #D6E6F2;
+  font-weight: 400;
+}
+
+.description {
+  position: relative;
+  width: 70%;
+  margin: auto;
+}
+
+.rules, .alerts {
+  background: #FFF;
+  padding: 2em;
+  width: 100%;
+  margin: 1em 0;
+  transition: transform 1s;
+  transform: translateX(0);
+}
+
+.rules.out {
+  transform: translateX(-150%);
+}
+
+.alerts {
   position: absolute;
   top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
+}
+
+.spotted {
+  display: none;
+}
+
+.alerts.out {
+  transform: translateX(150%);
+}
+
+.alerts .counter  {
+  margin: 0;
+}
+
+.play-button {
+  display: none;
+  font-family: 'Montserrat', sans-serif;
+  text-decoration: none;
   margin: auto;
+  background: #FFF200;
+  padding: 7px 12px;
+  margin-top: 1em;
+  border: solid 1px #F5F5F5;
+  transition: border 1s;
+  font-size: 1.3em;
+}
+
+.play-button:hover {
+  border: solid 1px #303481;
+}
+
+.play-button.disable {
+  border: solid 1px #F5F5F5;
+  background-color: #D6E6F2;
+}
+
+#eyes {
+  display: flex;
+  justify-content: center;
+  /*align-items: flex-end;*/
+  min-height: 52px;
+  margin: 4em 0;
+}
+
+.eyesPicto {
+  display: none;
+  margin: 0 2em;
+}
+
+.game {
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-start;
+}
+
+#motion {
+  /*display: none;*/
   -moz-transform: scale(-1, 1);
   -webkit-transform: scale(-1, 1);
   -o-transform: scale(-1, 1);
@@ -24,6 +125,17 @@
   display: none;
 }
 
+.counter {
+  text-align: center;
+  font-size: 2em;
+  display: none;
+}
+
+#start {
+  font-size: 5em;
+  padding-top: 100px;
+}
+
 .motion-box {
 	/*display: none;*/
 	position: absolute;
@@ -31,11 +143,6 @@
 	transition: all .1s;
   left: 0;
   top: 0;
-}
-
-.eyesPicto {
-  display: none;
-  width: 200px;
 }
 
 .visible {
