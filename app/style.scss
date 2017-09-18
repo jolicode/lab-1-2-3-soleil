@@ -56,19 +56,24 @@ b {
 
 .alerts {
   position: absolute;
+  display: flex;
+  justify-content: center;
   top: 0;
+  &.out {
+    transform: translateX(150%);
+  }
+  .counter  {
+    margin: 0;
+  }
 }
 
 .spotted {
   display: none;
-}
-
-.alerts.out {
-  transform: translateX(150%);
-}
-
-.alerts .counter  {
-  margin: 0;
+  padding-left: 1em;
+  font-family: 'Montserrat', sans-serif;
+  b {
+    font-family: 'Montserrat', sans-serif;
+  }
 }
 
 .play-button {
@@ -82,15 +87,13 @@ b {
   border: solid 1px #F5F5F5;
   transition: border 1s;
   font-size: 1.3em;
-}
-
-.play-button:hover {
-  border: solid 1px #303481;
-}
-
-.play-button.disable {
-  border: solid 1px #F5F5F5;
-  background-color: #D6E6F2;
+  &:hover {
+    border: solid 1px #303481;
+  }
+  &.disable {
+    border: solid 1px #F5F5F5;
+    background-color: #D6E6F2;
+  }
 }
 
 #eyes {
@@ -113,7 +116,6 @@ b {
 }
 
 #motion {
-  /*display: none;*/
   -moz-transform: scale(-1, 1);
   -webkit-transform: scale(-1, 1);
   -o-transform: scale(-1, 1);
@@ -121,8 +123,14 @@ b {
   filter: FlipH;
 }
 
+.motionStyle {
+  display: none;
+}
+
 .win {
   display: none;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 2em;
 }
 
 .counter {

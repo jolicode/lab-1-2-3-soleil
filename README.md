@@ -1,7 +1,7 @@
-1 2 3 soleil - game for motion detection article 
+Motion Detection Game
 ========
 
-#### Game ####
+#### Rules ####
 
 The aim of the game is to press space key without being spotted by our computeur.
 
@@ -16,3 +16,23 @@ navigator.mediaDevices.getUserMedia(constraints)
 ```
 
 function.
+
+## Installing
+
+```cmd
+yarn install
+```
+
+## Development
+
+* build:
+
+    ```cmd
+    gulp
+    ```
+
+* serve:
+
+    ```cmd
+    gulp serve
+    ```

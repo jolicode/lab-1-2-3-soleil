@@ -4,6 +4,7 @@ var webpack = require('webpack-stream');
 const eslint = require('gulp-eslint');
 const sass = require('gulp-sass');
 const babel = require('gulp-babel');
+const del = require('del');
 
 var paths = {
   scripts: './app/*.js',
@@ -18,11 +19,17 @@ gulp.task('lint', function () {
     .pipe(eslint.failAfterError());
 });
 
-gulp.task('scripts', ['lint'] , function() {
+gulp.task('babel', ['lint'] , function() {
   return gulp.src(paths.scripts)
-    .pipe(babel({
-      presets: ['env']
-    }))
+  .pipe(babel({
+    "presets": [
+      ["env", { targets: { node: true } }],
+    ]
+  }))
+});
+
+gulp.task('scripts', ['babel'] , function() {
+  return gulp.src(paths.scripts)
     .pipe(webpack(
       {output: {
         filename: 'index.js',
@@ -40,6 +47,12 @@ gulp.task('sass', function () {
   return gulp.src(paths.sass)
     .pipe(sass().on('error', sass.logError))
     .pipe(gulp.dest('build/css'))
+});
+
+gulp.task('clean', function() {
+    del('build/css');
+    del('build/js');
+    del('build/assets');
 });
 
 //Rerun the task when a file changes
@@ -60,6 +73,4 @@ gulp.task('serve', ['watch'], () => {
     });
 });
 
-gulp.task('default', ['watch', 'scripts', 'images', 'sass'], function() {
-  // build task
-});
+gulp.task('default', ['clean', 'scripts', 'images', 'sass']);
