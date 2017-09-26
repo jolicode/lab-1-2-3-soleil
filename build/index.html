@@ -16,22 +16,23 @@
         <div class="rules">
           <p class="win">You won !</p>
           <p>
-            Game using <b>motion detection</b>. Your goal is to <b>press space</b> without being spotted by the computeur. You will have <b>3 seconds</b> to move than 3 where you cannot. If a movement is being spotted the computer let you 5 secs to go back
+            Game using <b>motion detection</b>. Your goal is to <b>press space</b> without being spotted by the computeur. You will have <b>3 seconds</b> to move then 3 where you cannot. If a movement is being spotted the computer give you 5 secs to go back
             to the beginning point.
             </br>
             When play is pressed, you'll have 10 seconds to go to <b>base camp</b> (5 - 10 meters from the computeur).
           </p>
         </div>
         <div class="alerts out">
-          <p id="gameCount" data-time="3000" class="counter visible">3</p>
-          <p class="spotted">I've <b>seen</b> you ! Go back to the <b>base</b></p>
+          <p class="step visible"></p>
+          <p id="gameCount" class="counter visible"></p>
+          <p class="spotted">Go back to the <b>base</b></p>
         </div>
       </div>
 
       <a href="#" class="play-button visible">Play</a>
     </div>
 
-    <div id="start" data-time="1000" class="counter visible">10</div>
+    <div id="start" class="counter visible">10</div>
 
     <video id="video" autoplay></video>
     <div id="box-container"></div>

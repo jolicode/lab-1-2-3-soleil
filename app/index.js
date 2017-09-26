@@ -1,13 +1,15 @@
 import DiffCam from './DiffCam';
 
-const MyDiffCam = new DiffCam();
+let MyDiffCam = [];
+
 const domElements = {
+  body: document.getElementById('body'),
   video: document.getElementById('video'),
   playButton: document.querySelector('.play-button'),
   eyes: document.querySelectorAll('.eyesPicto'),
   rules: document.querySelector('.rules'),
   alerts: document.querySelector('.alerts'),
-  spotted: document.querySelector('.spotted'),
+  step: document.querySelector('.step'),
   win: document.querySelector('.win'),
 };
 
@@ -18,7 +20,7 @@ var counters = {
   },
   start: {
     el: document.getElementById('start'),
-    sec: 1,
+    sec: 10,
   },
 };
 
@@ -27,14 +29,17 @@ let win = false;
 let start = false;
 let firstTime = true;
 let gameTimer;
+let canWin = false;
 
 domElements.playButton.addEventListener('click', e => {
   e.preventDefault();
   const constraints = {
     audio: false,
     video: {
-      width: 640,
-      height: 480,
+      width: {min: 640, ideal: 1280, max: 1920},
+      height: {min: 400, ideal: 720},
+      facingMode: 'user',
+      frameRate: {max: 25},
     },
   };
   domElements.playButton.classList.toggle('visible');
@@ -88,6 +93,9 @@ function initSuccess(requestedStream) {
   // streaming takes a moment to start
   domElements.video.addEventListener('canplay', startComplete);
   domElements.video.srcObject = stream;
+  domElements.video.onloadedmetadata = function() {
+    MyDiffCam = new DiffCam(this.videoWidth, this.videoHeight);
+  };
 }
 
 function startComplete() {
@@ -95,63 +103,93 @@ function startComplete() {
   MyDiffCam.start(domElements.video);
 
   //init game to waiting state
-  let time = 4;
+  let time = 0;
   MyDiffCam.diffSwitch = false;
-  MyDiffCam.reset();
   let nextStep = 2;
 
   gameTimer = setInterval(() => {
-    // faire evoluer le compteur
-    if (time > 0 && time < 4) {
-      time -= 1;
+    // game counter
+    // inside a game step
+    if (time > 0 && time < counters.game.sec) {
+      time += 1;
       counters.game.el.innerHTML = time;
-      if (nextStep == 3) {
-        toggleEyes(time + 3);
-      }
+      const rand = Math.floor(Math.random() * (5 - 2 + 1) + 2);
 
-      if (MyDiffCam.motionCoords.length > 1500) {
-        domElements.spotted.classList.add('visible');
+      switch (nextStep) {
+        case 1:
+          domElements.step.innerHTML = 'Watching';
+          if (MyDiffCam.motionCoords.length > 1000) {
+            MyDiffCam.saveDiff();
+          } else {
+            MyDiffCam.reset(false);
+          }
+          break;
+        case 2:
+          domElements.step.innerHTML = '';
+          synthVoice(time);
+          break;
+        case 3:
+          domElements.step.innerHTML = 'Extra time';
+          toggleEyes(rand);
+          break;
       }
-      // check si une function est à lancer
-    } else if (time == 4 && !win) {
-      time -= 1;
+      // Begin of a game step
+    } else if (time == 0 && !win) {
+      time += 1;
       counters.game.el.innerHTML = time;
       switch (nextStep) {
         case 1: // playing
+          domElements.step.innerHTML = 'Watching';
+          domElements.body.classList.add('watch');
+          canWin = false;
           MyDiffCam.diffSwitch = true;
+          MyDiffCam.reset(true);
           toggleEyes(2);
           break;
         case 2: // waiting
+          domElements.step.innerHTML = '';
           toggleEyes(1);
           MyDiffCam.diffSwitch = false;
-          MyDiffCam.reset();
-          domElements.spotted.classList.remove('visible');
+          canWin = true;
+          MyDiffCam.reset(true);
+          domElements.body.classList.remove('on');
+          synthVoice(time);
           break;
         case 3: // resetting
+          domElements.step.innerHTML = 'Extra time';
           toggleEyes(3);
           MyDiffCam.diffSwitch = false;
-          MyDiffCam.reset();
           break;
       }
-    } else if (time == 0 && !win) {
-      counters.game.el.innerHTML = 0;
+      // end of a game step and setting the next one
+    } else if (time == counters.game.sec && !win) {
+      counters.game.el.innerHTML = '';
       switch (nextStep) {
         case 1: // playing
-          if (MyDiffCam.motionCoords.length > 1500) {
+          domElements.body.classList.remove('watch');
+          if (MyDiffCam.savedCoords.length > 0) {
+            domElements.body.classList.add('on');
+            domElements.step.innerHTML = 'Extra time';
             nextStep = 3;
+            counters.game.sec = 5;
           } else {
+            domElements.step.innerHTML = '';
             nextStep = 2;
           }
           break;
         case 2: // waiting
+          domElements.step.innerHTML = '';
+          counters.game.el.innerHTML = 'SOLEIL';
+          synthVoice('soleil');
           nextStep = 1;
           break;
         case 3: // resetting
+          domElements.step.innerHTML = 'Ready ?';
           nextStep = 2;
+          counters.game.sec = 3;
           break;
       }
-      //resetting time to start step
-      time = 4;
+      time = 0;
     }
   }, 1000);
 }
@@ -177,7 +215,7 @@ function setTimer(counter, callback) {
 function toggleEyes(number) {
   for (var i = 0; i < domElements.eyes.length; i++) {
     if (domElements.eyes[i].dataset.number == number) {
-      domElements.eyes[i].classList.toggle('visible');
+      domElements.eyes[i].classList.add('visible');
     } else {
       domElements.eyes[i].classList.remove('visible');
     }
@@ -189,7 +227,7 @@ document.onkeydown = checkKey;
 
 function checkKey(e) {
   e = e || window.event;
-  if (e.keyCode == '32' && start) {
+  if (e.keyCode == '32' && start && canWin) {
     // win and reset
     start = false;
     win = true;
@@ -204,4 +242,12 @@ function checkKey(e) {
     toggleEyes(-1);
     counters.start.el.innerHTML = 10;
   }
+}
+
+function synthVoice(text) {
+  const synth = window.speechSynthesis;
+  const utterance = new SpeechSynthesisUtterance();
+  utterance.text = text;
+  utterance.lang = 'fr-FR';
+  synth.speak(utterance);
 }

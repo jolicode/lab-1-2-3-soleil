@@ -19,10 +19,20 @@
 
 #body, body {
   background: #F5F5F5;
-  height: 100vh;
+  min-height: 100vh;
   width: 100%;
   margin: 0;
   padding: 0;
+  transition: background 0.5s ease-in;
+  &.on {
+    background: #ff9282;
+    .spotted {
+      opacity: 1;
+    }
+  }
+  &.watch {
+    background: #fff772;
+  }
 }
 
 .header {
@@ -46,7 +56,7 @@ b {
   padding: 2em;
   width: 100%;
   margin: 1em 0;
-  transition: transform 1s;
+  transition: transform 1s, border 1s;
   transform: translateX(0);
 }
 
@@ -58,22 +68,31 @@ b {
   position: absolute;
   display: flex;
   justify-content: center;
+  align-items: center;
   top: 0;
+  .step, .counter, .spotted {
+    width: 33.33%;
+  }
   &.out {
     transform: translateX(150%);
   }
   .counter  {
+    text-align: center;
     margin: 0;
+    font-family: 'Montserrat', sans-serif;
+  }
+
+}
+
+.step, .spotted {
+  font-size: 1.2em;
+  b {
   }
 }
 
 .spotted {
-  display: none;
-  padding-left: 1em;
-  font-family: 'Montserrat', sans-serif;
-  b {
-    font-family: 'Montserrat', sans-serif;
-  }
+  text-align: right;
+  opacity: 0;
 }
 
 .play-button {
@@ -155,4 +174,25 @@ b {
 
 .visible {
   display: block;
+}
+
+@media (max-width: 930px) {
+  .description {
+    width: 95%;
+  }
+  .game {
+    flex-direction: column;
+    align-items: center;
+  }
+  .rules.out {
+    height: 0px;
+  }
+  .alerts {
+    flex-direction: column;
+    align-items: center;
+    .step, .counter, .spotted {
+      width: 90%;
+      text-align: center;
+    }
+  }
 }

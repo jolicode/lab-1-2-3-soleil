@@ -1,20 +1,37 @@
 export default class DiffCam {
-  constructor() {
+  constructor(width, height) {
     this.canvas = {
       motion: document.getElementById('motion'),
       capture: document.createElement('canvas'), // internal canvas for capturing full images from video
       diff: document.createElement('canvas'), // internal canvas for diffing downscaled captures
     };
 
+    let widthNav =
+      window.innerWidth ||
+      document.documentElement.clientWidth ||
+      document.body.clientWidth;
+    let widthCanvas = 0;
+    if (widthNav > 2500) {
+      widthCanvas = 2500 * 0.6;
+    } else if (widthNav > 930 && widthNav <= 2500) {
+      widthCanvas = Math.floor(widthNav * 0.6);
+    } else {
+      widthCanvas = Math.floor(widthNav * 0.9);
+    }
+
+    let ratio = this.gcd(width, height);
+
     this.captureIntervalTime = 100; // time between captures, in ms
-    this.canvasWidth = 640; // full captured image width
-    this.canvasHeight = 480; // full captured image height
+    this.canvasWidth = widthCanvas; // responsive size for canvas
+    this.canvasHeight = widthCanvas / (width / ratio) * (height / ratio);
     this.isReadyToDiff = false;
-    this.pixelDiffThreshold = 128; // min for a pixel to be considered significant
+    this.pixelDiffThreshold = 200; // min for a pixel to be considered significant
     this.scoreThreshold = 32; // min for an image to be considered significant
 
     this.motionCoords = [];
+    this.savedCoords = [];
     this.diffSwitch = false;
+    this.drawSwitch = false;
 
     this.canvas.capture.width = this.canvasWidth;
     this.canvas.capture.height = this.canvasHeight;
@@ -97,15 +114,21 @@ export default class DiffCam {
       }
     }
 
-    // drawing all save motion data
-    for (var y = 0; y < this.motionCoords.length; y++) {
-      this.motionContext.fillStyle = '#FFF200';
-      this.motionContext.fillRect(
-        this.motionCoords[y].x - 2,
-        this.motionCoords[y].y - 2,
-        4,
-        4
-      );
+    if (this.isReadyToDiff) {
+      // drawing all save motion data
+      for (var y = 0; y < this.savedCoords.length; y++) {
+        if (this.savedCoords[y].x < this.canvasWidth / 2) {
+          this.motionContext.fillStyle = '#FFF200';
+        } else {
+          this.motionContext.fillStyle = '#F46060';
+        }
+        this.motionContext.fillRect(
+          this.savedCoords[y].x - 2,
+          this.savedCoords[y].y - 2,
+          4,
+          4
+        );
+      }
     }
 
     // draw current capture normally over diff, ready for next time
@@ -127,8 +150,14 @@ export default class DiffCam {
     };
   }
 
-  reset() {
+  saveDiff() {
+    this.savedCoords = this.savedCoords.concat(this.motionCoords);
+    this.reset(false);
+  }
+
+  reset(all) {
     this.motionCoords = [];
+    this.savedCoords = all ? [] : this.savedCoords;
   }
 
   stop() {
@@ -138,5 +167,9 @@ export default class DiffCam {
       this.canvas.motion.classList.remove('visible');
       this.isReadyToDiff = false;
     }
+  }
+
+  gcd(a, b) {
+    return b == 0 ? a : this.gcd(b, a % b);
   }
 }
