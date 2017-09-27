@@ -1,5 +1,5 @@
 {
-  "name": "jolisoleil",
+  "name": "1 2 3 soleil",
   "version": "1.0.0",
   "description": "motion detection game",
   "main": "index.js",
@@ -8,14 +8,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jolicode/pitchoune-apprendre-coder.git"
+    "url": "git+https://github.com/jolicode/1-2-3-soleil.git"
   },
   "author": "Cécile Delmon",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/jolicode/pitchoune-apprendre-coder/issues"
+    "url": "https://github.com/jolicode/1-2-3-soleil/issues"
   },
-  "homepage": "https://github.com/jolicode/pitchoune-apprendre-coder#readme",
+  "homepage": "https://github.com/jolicode/1-2-3-soleil#readme",
   "devDependencies": {
     "babel-core": "^6.26.0",
     "babel-preset-env": "^1.6.0",
@@ -27,6 +27,7 @@
     "gulp-babel": "^7.0.0",
     "gulp-eslint": "^4.0.0",
     "gulp-sass": "^3.1.0",
+    "gulp-uglify": "^3.0.0",
     "prettier": "^1.6.1",
     "webpack-stream": "^4.0.0"
   },

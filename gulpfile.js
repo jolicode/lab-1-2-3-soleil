@@ -5,6 +5,7 @@ const eslint = require('gulp-eslint');
 const sass = require('gulp-sass');
 const babel = require('gulp-babel');
 const del = require('del');
+const uglify = require('gulp-uglify');
 
 var paths = {
   scripts: './app/*.js',
@@ -19,22 +20,19 @@ gulp.task('lint', function () {
     .pipe(eslint.failAfterError());
 });
 
-gulp.task('babel', ['lint'] , function() {
-  return gulp.src(paths.scripts)
-  .pipe(babel({
-    "presets": [
-      ["env", { targets: { node: true } }],
-    ]
-  }))
-});
-
-gulp.task('scripts', ['babel'] , function() {
+gulp.task('scripts', ['lint'] , function() {
   return gulp.src(paths.scripts)
     .pipe(webpack(
       {output: {
         filename: 'index.js',
       }}
     ))
+    .pipe(babel({
+      "presets": [
+        ["env", { targets: { node: true } }],
+      ]
+    }))
+    .pipe(uglify())
     .pipe(gulp.dest('build/js'));
 });
 
