@@ -47,7 +47,8 @@ b {
   width: 100%;
   margin: 1em 0;
   transition: transform 1s, border 1s;
-  transform: translateX(0); }
+  transform: translateX(0);
+  line-height: 1.5em; }
 
 .rules.out {
   transform: translateX(-150%); }

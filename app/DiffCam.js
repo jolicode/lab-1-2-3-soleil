@@ -115,6 +115,10 @@ export default class DiffCam {
     }
 
     if (this.isReadyToDiff) {
+      // saving current data if it's above level
+      if (this.motionCoords.length > 1500) {
+        this.saveDiff();
+      }
       // drawing all save motion data
       for (var y = 0; y < this.savedCoords.length; y++) {
         if (this.savedCoords[y].x < this.canvasWidth / 2) {
@@ -130,6 +134,13 @@ export default class DiffCam {
         );
       }
     }
+
+    // separation for 2 players
+    this.motionContext.beginPath();
+    this.motionContext.moveTo(this.canvasWidth / 2, 0);
+    this.motionContext.lineTo(this.canvasWidth / 2, this.canvasHeight);
+    this.motionContext.strokeStyle = '#ffffff';
+    this.motionContext.stroke();
 
     // draw current capture normally over diff, ready for next time
     this.diffContext.globalCompositeOperation = 'source-over';

@@ -33,24 +33,24 @@ gulp.task('scripts', ['lint'] , function() {
       ]
     }))
     .pipe(uglify())
-    .pipe(gulp.dest('build/js'));
+    .pipe(gulp.dest('docs/js'));
 });
 
 gulp.task('images', function() {
   return gulp.src(paths.images)
-    .pipe(gulp.dest('build/assets'));
+    .pipe(gulp.dest('docs/assets'));
 });
 
 gulp.task('sass', function () {
   return gulp.src(paths.sass)
     .pipe(sass().on('error', sass.logError))
-    .pipe(gulp.dest('build/css'))
+    .pipe(gulp.dest('docs/css'))
 });
 
 gulp.task('clean', function() {
-    del('build/css');
-    del('build/js');
-    del('build/assets');
+    del('docs/css');
+    del('docs/js');
+    del('docs/assets');
 });
 
 //Rerun the task when a file changes
@@ -67,7 +67,7 @@ gulp.task('serve', ['watch'], () => {
         open: true,
         reloadOnRestart : true,
         online : true,
-        server: "./build"
+        server: "./docs"
     });
 });
 

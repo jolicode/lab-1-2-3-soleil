@@ -104,7 +104,6 @@ function startComplete() {
 
   //init game to waiting state
   let time = 0;
-  MyDiffCam.diffSwitch = false;
   let nextStep = 2;
 
   gameTimer = setInterval(() => {
@@ -117,19 +116,12 @@ function startComplete() {
 
       switch (nextStep) {
         case 1:
-          domElements.step.innerHTML = 'Watching';
-          if (MyDiffCam.motionCoords.length > 1000) {
-            MyDiffCam.saveDiff();
-          } else {
-            MyDiffCam.reset(false);
-          }
+          MyDiffCam.reset(false);
           break;
         case 2:
-          domElements.step.innerHTML = '';
           synthVoice(time);
           break;
         case 3:
-          domElements.step.innerHTML = 'Extra time';
           toggleEyes(rand);
           break;
       }
@@ -143,20 +135,22 @@ function startComplete() {
           domElements.body.classList.add('watch');
           canWin = false;
           MyDiffCam.diffSwitch = true;
-          MyDiffCam.reset(true);
           toggleEyes(2);
           break;
         case 2: // waiting
           domElements.step.innerHTML = '';
           toggleEyes(1);
           MyDiffCam.diffSwitch = false;
-          canWin = true;
           MyDiffCam.reset(true);
+          canWin = true;
+          domElements.body.classList.remove('watch');
           domElements.body.classList.remove('on');
           synthVoice(time);
           break;
         case 3: // resetting
           domElements.step.innerHTML = 'Extra time';
+          domElements.body.classList.remove('watch');
+          domElements.body.classList.add('on');
           toggleEyes(3);
           MyDiffCam.diffSwitch = false;
           break;
@@ -166,19 +160,15 @@ function startComplete() {
       counters.game.el.innerHTML = '';
       switch (nextStep) {
         case 1: // playing
-          domElements.body.classList.remove('watch');
+          MyDiffCam.reset(false);
           if (MyDiffCam.savedCoords.length > 0) {
-            domElements.body.classList.add('on');
-            domElements.step.innerHTML = 'Extra time';
             nextStep = 3;
             counters.game.sec = 5;
           } else {
-            domElements.step.innerHTML = '';
             nextStep = 2;
           }
           break;
         case 2: // waiting
-          domElements.step.innerHTML = '';
           counters.game.el.innerHTML = 'SOLEIL';
           synthVoice('soleil');
           nextStep = 1;
