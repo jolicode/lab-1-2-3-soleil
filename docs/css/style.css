@@ -7,7 +7,9 @@
 .title {
   font-family: 'Montserrat', sans-serif;
   text-align: center;
-  text-transform: uppercase; }
+  text-transform: uppercase;
+  margin: 0;
+  padding-top: 0.5em; }
 
 * {
   font-family: 'Cardo', serif;
@@ -15,6 +17,7 @@
   box-sizing: border-box; }
 
 #body, body {
+  overflow-x: hidden;
   background: #F5F5F5;
   min-height: 100vh;
   width: 100%;
@@ -144,16 +147,22 @@ b {
   display: block; }
 
 @media (max-width: 930px) {
+  .no-mobile {
+    display: none !important;
+    opacity: 0; }
   .description {
     width: 95%; }
   .game {
     flex-direction: column;
     align-items: center; }
   .rules.out {
-    height: 0px; }
+    height: 215px; }
   .alerts {
     flex-direction: column;
     align-items: center; }
     .alerts .step, .alerts .counter, .alerts .spotted {
       width: 90%;
-      text-align: center; } }
+      text-align: center; }
+  #start {
+    font-size: 4em;
+    padding-top: 20px; } }

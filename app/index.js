@@ -33,73 +33,77 @@ let canWin = false;
 
 domElements.playButton.addEventListener('click', e => {
   e.preventDefault();
-  const constraints = {
-    audio: false,
-    video: {
-      width: {min: 640, ideal: 1280, max: 1920},
-      height: {min: 400, ideal: 720},
-      facingMode: 'user',
-      frameRate: {max: 25},
-    },
-  };
   domElements.playButton.classList.toggle('visible');
-  setTimer(counters.start, () => {
-    if (firstTime) {
-      if (navigator.mediaDevices === undefined) {
-        navigator.mediaDevices = {};
-      }
-      if (navigator.mediaDevices.getUserMedia === undefined) {
-        navigator.mediaDevices.getUserMedia = function(constraints) {
-          // First get ahold of the legacy getUserMedia, if present
-          var getUserMedia =
-            navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
-          // Some browsers just don't implement it - return a rejected promise with an error
-          // to keep a consistent interface
-          if (!getUserMedia) {
-            return Promise.reject(
-              new Error('getUserMedia is not implemented in this browser')
-            );
-          }
-          // Otherwise, wrap the call to the old navigator.getUserMedia with a Promise
-          return new Promise(function(resolve, reject) {
-            getUserMedia.call(navigator, constraints, resolve, reject);
-          });
-        };
-      }
-      navigator.mediaDevices
-        .getUserMedia(constraints)
-        .then(initSuccess)
-        .catch(initError);
-      firstTime = false;
-    } else {
-      start = true;
-      win = false;
-      startComplete();
+
+  if (firstTime) {
+    const constraints = {
+      audio: false,
+      video: {
+        width: {min: 640, ideal: 1280, max: 1920},
+        height: {min: 400, ideal: 720},
+        facingMode: 'user',
+        frameRate: {max: 25},
+      },
+    };
+    if (navigator.mediaDevices === undefined) {
+      navigator.mediaDevices = {};
     }
-    counters.start.el.classList.toggle('visible');
-    domElements.win.classList.remove('visible');
-    domElements.rules.classList.toggle('out');
-    domElements.alerts.classList.toggle('out');
-  });
+    //ask video permission
+    if (navigator.mediaDevices.getUserMedia === undefined) {
+      navigator.mediaDevices.getUserMedia = function(constraints) {
+        // First get ahold of the legacy getUserMedia, if present
+        var getUserMedia =
+          navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+        // Some browsers just don't implement it - return a rejected promise with an error
+        // to keep a consistent interface
+        if (!getUserMedia) {
+          return Promise.reject(
+            new Error('getUserMedia is not implemented in this browser')
+          );
+        }
+        // Otherwise, wrap the call to the old navigator.getUserMedia with a Promise
+        return new Promise(function(resolve, reject) {
+          getUserMedia.call(navigator, constraints, resolve, reject);
+        });
+      };
+    }
+    navigator.mediaDevices
+      .getUserMedia(constraints)
+      .then(initSuccess)
+      .catch(initError);
+    firstTime = false;
+  } else {
+    launchStart();
+  }
 });
 
 function initSuccess(requestedStream) {
-  start = true;
-  win = false;
   var stream = requestedStream;
   if (!stream) {
     throw 'Cannot start after init fail';
   }
   // streaming takes a moment to start
-  domElements.video.addEventListener('canplay', startComplete);
+  domElements.video.addEventListener('canplay', launchStart);
   domElements.video.srcObject = stream;
   domElements.video.onloadedmetadata = function() {
     MyDiffCam = new DiffCam(this.videoWidth, this.videoHeight);
   };
 }
 
+function launchStart() {
+  domElements.video.removeEventListener('canplay', launchStart);
+  start = true;
+  win = false;
+  setTimer(counters.start, () => {
+    counters.start.el.classList.toggle('visible');
+    domElements.win.classList.remove('visible');
+    domElements.rules.classList.toggle('out');
+    domElements.alerts.classList.toggle('out');
+    startComplete();
+  });
+}
+
 function startComplete() {
-  domElements.video.removeEventListener('canplay', startComplete);
   MyDiffCam.start(domElements.video);
 
   //init game to waiting state
@@ -217,7 +221,15 @@ document.onkeydown = checkKey;
 
 function checkKey(e) {
   e = e || window.event;
-  if (e.keyCode == '32' && start && canWin) {
+  if (e.keyCode == '32') {
+    resetGame();
+  }
+}
+
+domElements.body.addEventListener('touchend', resetGame, false);
+
+function resetGame() {
+  if (start && canWin) {
     // win and reset
     start = false;
     win = true;

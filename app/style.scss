@@ -9,6 +9,8 @@
   font-family: 'Montserrat', sans-serif;
   text-align: center;
   text-transform: uppercase;
+  margin: 0;
+  padding-top: 0.5em;
 }
 
 * {
@@ -18,6 +20,7 @@
 }
 
 #body, body {
+  overflow-x: hidden;
   background: #F5F5F5;
   min-height: 100vh;
   width: 100%;
@@ -178,6 +181,10 @@ b {
 }
 
 @media (max-width: 930px) {
+  .no-mobile {
+    display: none !important;
+    opacity: 0;
+  }
   .description {
     width: 95%;
   }
@@ -186,7 +193,7 @@ b {
     align-items: center;
   }
   .rules.out {
-    height: 0px;
+    height: 215px;
   }
   .alerts {
     flex-direction: column;
@@ -195,5 +202,9 @@ b {
       width: 90%;
       text-align: center;
     }
+  }
+  #start {
+    font-size: 4em;
+    padding-top: 20px;
   }
 }
