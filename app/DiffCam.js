@@ -159,8 +159,11 @@ export default class DiffCam {
 
     if (this.resettingStep) {
       if (this.score.left > 1000) {
+        this.motionContext.fillStyle = '#FFF200';
         this.draw(0, 0.7);
-      } else if (this.score.right > 1000) {
+      }
+      if (this.score.right > 1000) {
+        this.motionContext.fillStyle = '#F46060';
         this.draw(this.canvasWidth / 2, 0.7);
       }
     }
