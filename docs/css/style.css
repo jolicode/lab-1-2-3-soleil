@@ -24,10 +24,8 @@
   margin: 0;
   padding: 0;
   transition: background 0.5s ease-in; }
-  #body.on, body.on {
-    background: #ff9282; }
-    #body.on .spotted, body.on .spotted {
-      opacity: 1; }
+  #body.on .spotted, body.on .spotted {
+    opacity: 1; }
   #body.watch, body.watch {
     background: #fff772; }
 
@@ -72,11 +70,14 @@ b {
     font-family: 'Montserrat', sans-serif; }
 
 .step, .spotted {
-  font-size: 1.2em; }
+  font-size: 1.4em; }
 
 .spotted {
   text-align: right;
-  opacity: 0; }
+  opacity: 0;
+  font-family: 'Montserrat', sans-serif; }
+  .spotted b {
+    font-family: 'Montserrat', sans-serif; }
 
 .play-button {
   display: none;

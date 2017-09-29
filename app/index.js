@@ -139,6 +139,7 @@ function startComplete() {
           domElements.body.classList.add('watch');
           canWin = false;
           MyDiffCam.diffSwitch = true;
+          MyDiffCam.resettingStep = false;
           toggleEyes(2);
           break;
         case 2: // waiting
@@ -152,16 +153,18 @@ function startComplete() {
           synthVoice(time);
           break;
         case 3: // resetting
-          domElements.step.innerHTML = 'Extra time';
-          domElements.body.classList.remove('watch');
+          domElements.step.innerHTML = 'EXTRA TIME';
           domElements.body.classList.add('on');
           toggleEyes(3);
           MyDiffCam.diffSwitch = false;
+          MyDiffCam.backBase();
+          MyDiffCam.resettingStep = true;
+          MyDiffCam.reset(false);
           break;
       }
       // end of a game step and setting the next one
     } else if (time == counters.game.sec && !win) {
-      counters.game.el.innerHTML = '';
+      counters.game.el.innerHTML = '..';
       switch (nextStep) {
         case 1: // playing
           MyDiffCam.reset(false);
@@ -224,6 +227,9 @@ function checkKey(e) {
   if (e.keyCode == '32') {
     resetGame();
   }
+  if (e.keyCode == '38' && MyDiffCam != undefined) {
+    MyDiffCam.debug = MyDiffCam.debug == true ? false : true;
+  }
 }
 
 domElements.body.addEventListener('touchend', resetGame, false);
@@ -247,9 +253,9 @@ function resetGame() {
 }
 
 function synthVoice(text) {
-  const synth = window.speechSynthesis;
+  //const synth = window.speechSynthesis;
   const utterance = new SpeechSynthesisUtterance();
   utterance.text = text;
   utterance.lang = 'fr-FR';
-  synth.speak(utterance);
+  //synth.speak(utterance);
 }

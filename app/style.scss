@@ -28,7 +28,6 @@
   padding: 0;
   transition: background 0.5s ease-in;
   &.on {
-    background: #ff9282;
     .spotted {
       opacity: 1;
     }
@@ -89,14 +88,16 @@ b {
 }
 
 .step, .spotted {
-  font-size: 1.2em;
-  b {
-  }
+  font-size: 1.4em;
 }
 
 .spotted {
   text-align: right;
   opacity: 0;
+  font-family: 'Montserrat', sans-serif;
+  b {
+    font-family: 'Montserrat', sans-serif;
+  }
 }
 
 .play-button {

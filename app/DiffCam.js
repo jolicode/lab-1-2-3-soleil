@@ -28,10 +28,17 @@ export default class DiffCam {
     this.pixelDiffThreshold = 200; // min for a pixel to be considered significant
     this.scoreThreshold = 32; // min for an image to be considered significant
 
-    this.motionCoords = [];
+    this.motionCoordsL = [];
+    this.motionCoordsR = [];
     this.savedCoords = [];
+    this.rgba = [];
     this.diffSwitch = false;
-    this.drawSwitch = false;
+    this.resettingStep = false;
+    this.score = {
+      right: 0,
+      left: 0,
+    };
+    this.debug = false;
 
     this.canvas.capture.width = this.canvasWidth;
     this.canvas.capture.height = this.canvasHeight;
@@ -54,6 +61,9 @@ export default class DiffCam {
   }
 
   capture(video) {
+    this.captureContext.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
+    this.motionContext.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
+
     this.captureContext.drawImage(
       video,
       0,
@@ -101,37 +111,57 @@ export default class DiffCam {
     );
 
     if (this.isReadyToDiff && this.diffSwitch) {
-      let rgba = diffImageData.data;
+      this.rgba = diffImageData.data;
       // pixel adjustments are done by reference directly on diffImageData
-      //let score = 0;
-      for (let i = 0; i < rgba.length; i += 4) {
-        const pixelDiff = rgba[i] * 0.6 + rgba[i + 1] * 0.6 + rgba[i + 2] * 0.6;
+      for (let i = 0; i < this.rgba.length; i += 4) {
+        const pixelDiff =
+          this.rgba[i] * 0.6 + this.rgba[i + 1] * 0.6 + this.rgba[i + 2] * 0.6;
         if (pixelDiff >= this.pixelDiffThreshold) {
-          //score++;
           const coords = this.calculateCoordinates(i / 4);
-          this.motionCoords.push({x: coords.x, y: coords.y});
+          if (coords.x < this.canvasWidth / 2) {
+            this.motionCoordsL.push({x: coords.x, y: coords.y});
+          } else {
+            this.motionCoordsR.push({x: coords.x, y: coords.y});
+          }
+        }
+      }
+      this.rgba = [];
+    }
+    if (this.isReadyToDiff) {
+      // drawing if it's above level
+      if (this.motionCoordsL.length > 750) {
+        this.motionContext.fillStyle = '#FFF200';
+        this.draw(0, 0.4);
+        this.saveDiff(this.motionCoordsL);
+      }
+      if (this.motionCoordsR.length > 750) {
+        this.motionContext.fillStyle = '#F46060';
+        this.draw(this.canvasWidth / 2, 0.4);
+        this.saveDiff(this.motionCoordsR);
+      }
+      // drawing all save motion data
+      if (this.debug) {
+        for (var y = 0; y < this.savedCoords.length; y++) {
+          if (this.savedCoords[y].x < this.canvasWidth / 2) {
+            this.motionContext.fillStyle = '#FFF200';
+          } else {
+            this.motionContext.fillStyle = '#F46060';
+          }
+          this.motionContext.fillRect(
+            this.savedCoords[y].x - 2,
+            this.savedCoords[y].y - 2,
+            4,
+            4
+          );
         }
       }
     }
 
-    if (this.isReadyToDiff) {
-      // saving current data if it's above level
-      if (this.motionCoords.length > 1500) {
-        this.saveDiff();
-      }
-      // drawing all save motion data
-      for (var y = 0; y < this.savedCoords.length; y++) {
-        if (this.savedCoords[y].x < this.canvasWidth / 2) {
-          this.motionContext.fillStyle = '#FFF200';
-        } else {
-          this.motionContext.fillStyle = '#F46060';
-        }
-        this.motionContext.fillRect(
-          this.savedCoords[y].x - 2,
-          this.savedCoords[y].y - 2,
-          4,
-          4
-        );
+    if (this.resettingStep) {
+      if (this.score.left > 1000) {
+        this.draw(0, 0.7);
+      } else if (this.score.right > 1000) {
+        this.draw(this.canvasWidth / 2, 0.7);
       }
     }
 
@@ -161,20 +191,46 @@ export default class DiffCam {
     };
   }
 
-  saveDiff() {
-    this.savedCoords = this.savedCoords.concat(this.motionCoords);
-    this.reset(false);
+  draw(start, alpha) {
+    this.motionContext.globalAlpha = alpha;
+    this.motionContext.fillRect(
+      start,
+      0,
+      this.canvasWidth / 2,
+      this.canvasHeight
+    );
+    this.motionContext.globalAlpha = 1.0;
+  }
+
+  saveDiff(motionCoords) {
+    this.savedCoords = this.savedCoords.concat(motionCoords);
   }
 
   reset(all) {
-    this.motionCoords = [];
-    this.savedCoords = all ? [] : this.savedCoords;
+    this.motionCoordsL = [];
+    this.motionCoordsR = [];
+    if (all) {
+      this.savedCoords = [];
+      this.score.right = 0;
+      this.score.left = 0;
+    }
+  }
+
+  backBase() {
+    for (var i = 0; i < this.savedCoords.length; i++) {
+      if (this.savedCoords[i].x > this.canvasWidth / 2) {
+        this.score.right++;
+      } else {
+        this.score.left++;
+      }
+    }
   }
 
   stop() {
     if (this.captureInterval) {
       clearInterval(this.captureInterval);
       this.motionContext.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
+      this.diffContext.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
       this.canvas.motion.classList.remove('visible');
       this.isReadyToDiff = false;
     }
